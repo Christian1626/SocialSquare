@@ -13,21 +13,22 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Handler;
 
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.TextView;
 
+
+import com.example.equipe1.webservice.Joueur;
 import com.example.equipe1.webservice.ThreadWS;
-import com.example.equipe1.webservice.WebService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,11 +74,7 @@ public class MainMenu extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        /*Log.d("MainMenu", "Avant Thread");
-        ThreadWS threadWS = new ThreadWS();
-        threadWS.execute();
-
-        Log.d("MainMenu","Après Thread");*/
+        //TODO: modifier avec les bon webservices
         callAsynchronousTask();
 
 
@@ -175,14 +172,11 @@ public class MainMenu extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            //View rootView = inflater.inflate(R.layout.fragment_main_menu, container, false);
-            //View rootView;
-            /*TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));*/
 
 
-
-            //home
+            //=================
+            //     HOME
+            //=================
             if(getArguments().getInt(ARG_SECTION_NUMBER) == 1) {
                 rootView = inflater.inflate(R.layout.fragment_main_menu,container,false);
                 rootView.setOnClickListener(touchListener);
@@ -190,62 +184,84 @@ public class MainMenu extends AppCompatActivity {
 
 
             }
-            //TOP SCORES
+            //=================
+            //   TOP SCORES
+            //=================
             else if(getArguments().getInt(ARG_SECTION_NUMBER) == 2) {
                 rootView = inflater.inflate(R.layout.fragment_topscores,container,false);
 
-                //config spinner
-                //Récupération du Spinner déclaré dans le fichier main.xml de res/layout
-                Spinner spinner = (Spinner) rootView.findViewById(R.id.spinner);
-                //Création d'une liste d'élément à mettre dans le Spinner(pour l'exemple)
-                List listJeux = new ArrayList();
-                listJeux.add("Jeux 1");
-                listJeux.add("Jeux 2");
-                listJeux.add("Jeux 3");
-
-                ArrayAdapter adapterSpinner = new ArrayAdapter(
-                        rootView.getContext(),
-                        android.R.layout.simple_spinner_item,
-                        listJeux
-                );
-
-                adapterSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinner.setAdapter(adapterSpinner);
-
-                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-                {
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        String selectedItem = parent.getItemAtPosition(position).toString();
-
-                        if (selectedItem.equals("Jeux 1")) {
-                            scores = scores1;
-                       } else {
-                            scores = scores2;
-                        }
-
-                        configGridView();
-                    }
-
-                    public void onNothingSelected(AdapterView<?> parent) {
-
-                    }
-                });
-
+                configSpinner();
                 configGridView();
 
 
-
-
             }
-            //
+            //=================
+            //    JOUEURS
+            //=================
+            else if(getArguments().getInt(ARG_SECTION_NUMBER) == 3) {
+                rootView = inflater.inflate(R.layout.fragment_joueurs,container,false);
+               ListView list = (ListView) rootView.findViewById(R.id.listJoueur);
+                List<Joueur> rowItems = new ArrayList<Joueur>();
+
+                for (int i = 0; i < 5; i++) {
+                    Joueur items = new Joueur("title");
+                    rowItems.add(items);
+                }
+
+                SimpleAdapter adapter = new SimpleAdapter(getActivity(), rowItems);
+                list.setAdapter(adapter);
+            }
+            //=================
+            //   EVENEMENTS
+            //=================
             else {
-                rootView = inflater.inflate(R.layout.activity_login,container,false);
+                rootView = inflater.inflate(R.layout.fragment_evenement,container,false);
+                WebView webView = (WebView) rootView.findViewById(R.id.webview);
+                webView.loadUrl("http://www.mairie-epron.fr/fr/agenda/agenda.php");
+                webView.setWebViewClient(new WebViewClient());
             }
             return rootView;
         }
 
 
+        void configSpinner() {
+            //config spinner
+            //Récupération du Spinner déclaré dans le fichier main.xml de res/layout
+            Spinner spinner = (Spinner) rootView.findViewById(R.id.spinner);
+            //Création d'une liste d'élément à mettre dans le Spinner(pour l'exemple)
+            List listJeux = new ArrayList();
+            listJeux.add("Jeux 1");
+            listJeux.add("Jeux 2");
+            listJeux.add("Jeux 3");
 
+            ArrayAdapter adapterSpinner = new ArrayAdapter(
+                    rootView.getContext(),
+                    android.R.layout.simple_spinner_item,
+                    listJeux
+            );
+
+            adapterSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinner.setAdapter(adapterSpinner);
+
+            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+            {
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    String selectedItem = parent.getItemAtPosition(position).toString();
+
+                    if (selectedItem.equals("Jeux 1")) {
+                        scores = scores1;
+                    } else {
+                        scores = scores2;
+                    }
+
+                    configGridView();
+                }
+
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+        }
 
         void configGridView() {
             //config gridview
@@ -314,18 +330,21 @@ public class MainMenu extends AppCompatActivity {
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 3;
+            return 4;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "HOME";
+                    return "ACCUEIL";
                 case 1:
                     return "TOP SCORES";
                 case 2:
-                    return "RECHERCHE JOUEURS";
+                    return "JOUEURS";
+                case 3:
+                    return "INFOS";
+
             }
             return null;
         }
