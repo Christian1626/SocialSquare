@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.os.Handler;
 
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -25,8 +26,15 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.equipe1.webservice.ThreadWS;
+import com.example.equipe1.webservice.WebService;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
+
 
 public class MainMenu extends AppCompatActivity {
 
@@ -65,10 +73,38 @@ public class MainMenu extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
+        /*Log.d("MainMenu", "Avant Thread");
+        ThreadWS threadWS = new ThreadWS();
+        threadWS.execute();
+
+        Log.d("MainMenu","Après Thread");*/
+        callAsynchronousTask();
+
 
         getSupportActionBar().hide();
     }
 
+    public void callAsynchronousTask() {
+        final Handler handler = new Handler();
+        Timer timer = new Timer();
+        TimerTask doAsynchronousTask = new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    public void run() {
+                        try {
+                            ThreadWS performBackgroundTask = new ThreadWS();
+                            // PerformBackgroundTask this class is the class that extends AsynchTask
+                            performBackgroundTask.execute();
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                        }
+                    }
+                });
+            }
+        };
+        timer.schedule(doAsynchronousTask, 0, 1000*10); //execute in every 50000 ms
+    }
 
 
 

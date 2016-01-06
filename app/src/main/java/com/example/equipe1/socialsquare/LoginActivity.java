@@ -31,6 +31,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,10 +80,6 @@ public class LoginActivity extends AppCompatActivity  {
         connexion.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("MSG","OnClick");
-                Log.d("password",password.getText().toString());
-                Log.d("login",login.getText().toString());
-
                 //if (password.getText().toString().equals("admin") && login.getText().toString().equals("admin")) {
                     Intent mainmenu = new Intent(LoginActivity.this, MainMenu.class);
                     startActivity(mainmenu);
