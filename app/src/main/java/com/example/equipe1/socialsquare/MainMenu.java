@@ -1,6 +1,5 @@
 package com.example.equipe1.socialsquare;
 
-import android.os.AsyncTask;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -29,16 +28,13 @@ import android.widget.Spinner;
 
 
 import com.example.equipe1.webservice.Joueur;
-import com.example.equipe1.webservice.Score;
 import com.example.equipe1.webservice.ThreadDispo;
 import com.example.equipe1.webservice.ThreadScore;
-import com.example.equipe1.webservice.ThreadWS;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ExecutionException;
 
 
 public class MainMenu extends AppCompatActivity {
@@ -78,7 +74,6 @@ public class MainMenu extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        //TODO: modifier avec les bon webservices
         callAsynchronousTask();
 
         getSupportActionBar().hide();
@@ -104,12 +99,8 @@ public class MainMenu extends AppCompatActivity {
                 });
             }
         };
-        timer.schedule(doAsynchronousTask, 0, 1000*10); //execute in every 50000 ms
+        timer.schedule(doAsynchronousTask, 0, 1000 * 10); //execute in every 50000 ms
     }
-
-
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -142,22 +133,17 @@ public class MainMenu extends AppCompatActivity {
          * fragment.
          */
 
-        public static boolean isDispo = true;
+        public static boolean isDispo;
         public static ImageView imageDispo;
         private static final String ARG_SECTION_NUMBER = "section_number";
         public static View rootView;
         public static GridView gridView;
+        public static int id;
         public static String[] scores1 = new String[] {
                 "Place","Nom","Score",
                 "1","Toto", "100","2", "Titi", "95","3", "Tata",
                 "80", "4","Tutu", "76","5", "Toto", "60","6",
                 "Coco", "50", "7","TheNoob"};
-
-        public static String[] scores2 = new String[] {
-                "Place","Nom","Score",
-                "1","Paul", "88","2", "Thomas", "85","3", "Jack",
-                "78", "4","Tom", "67","5", "Jim", "55","6",
-                "George", "60", "7","Jerry", "55"};
 
         public void setScores(String[] scores) {
             this.scores = scores;
@@ -176,6 +162,7 @@ public class MainMenu extends AppCompatActivity {
         public static PlaceholderFragment newInstance(int sectionNumber) {
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();
+            id = sectionNumber;
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
             return fragment;
@@ -185,52 +172,56 @@ public class MainMenu extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
 
-
+            Log.d("ID fragment",String.valueOf(getArguments().getInt(ARG_SECTION_NUMBER)));
             //=================
             //     HOME
             //=================
             if(getArguments().getInt(ARG_SECTION_NUMBER) == 1) {
                 rootView = inflater.inflate(R.layout.fragment_main_menu,container,false);
-                //
-                // rootView.setOnClickListener(touchListener);
+
                 imageDispo = (ImageView) rootView.findViewById(R.id.img_dispo);
+
+                changerDispo();
                 System.out.println("imagedispo:"+imageDispo);
-                //changerDispo();
             }
+
             //=================
             //   TOP SCORES
             //=================
             else if(getArguments().getInt(ARG_SECTION_NUMBER) == 2) {
                 rootView = inflater.inflate(R.layout.fragment_topscores,container,false);
-                System.out.println("1");
-                configScore("TicTacToe");
-                System.out.println("2");
+
+                gridView = (GridView) rootView.findViewById(R.id.gridView);
+
+
+                configScore("Memory");
                 configSpinner();
-                configGridView();
-                System.out.println("3");
-
-
+                //configGridView();
             }
+
             //=================
             //    JOUEURS
             //=================
             else if(getArguments().getInt(ARG_SECTION_NUMBER) == 3) {
                 rootView = inflater.inflate(R.layout.fragment_joueurs,container,false);
-               ListView list = (ListView) rootView.findViewById(R.id.listJoueur);
+
+                ListView list = (ListView) rootView.findViewById(R.id.listJoueur);
                 List<Joueur> rowItems = new ArrayList<Joueur>();
 
-                for (int i = 0; i < 5; i++) {
-                    Joueur items = new Joueur("title");
-                    rowItems.add(items);
-                }
+                rowItems.add(new Joueur("Christian"));
+                rowItems.add(new Joueur("Jeremy"));
+                rowItems.add(new Joueur("Martin"));
+                rowItems.add(new Joueur("Arnaud"));
+                rowItems.add(new Joueur("Robin"));
 
                 SimpleAdapter adapter = new SimpleAdapter(getActivity(), rowItems);
                 list.setAdapter(adapter);
             }
+
             //=================
             //   EVENEMENTS
             //=================
-            else {
+            else if(getArguments().getInt(ARG_SECTION_NUMBER) == 4) {
                 rootView = inflater.inflate(R.layout.fragment_evenement,container,false);
                 WebView webView = (WebView) rootView.findViewById(R.id.webview);
                 webView.loadUrl("http://www.mairie-epron.fr/fr/agenda/agenda.php");
@@ -246,13 +237,12 @@ public class MainMenu extends AppCompatActivity {
 
 
         void configSpinner() {
-            //config spinner
             //Récupération du Spinner déclaré dans le fichier main.xml de res/layout
             Spinner spinner = (Spinner) rootView.findViewById(R.id.spinner);
             //Création d'une liste d'élément à mettre dans le Spinner(pour l'exemple)
             List listJeux = new ArrayList();
-            listJeux.add("TicTacToe");
             listJeux.add("Memory");
+            listJeux.add("TicTacToe");
             listJeux.add("ConnectFour");
             listJeux.add("Dance");
             listJeux.add("HopScotch");
@@ -270,10 +260,8 @@ public class MainMenu extends AppCompatActivity {
             spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     String jeu = parent.getItemAtPosition(position).toString();
-                    System.out.println("nom: " + jeu);
+                    Log.d("Nom du jeu ",jeu);
                     configScore(jeu);
-
-                    //configGridView();
                 }
 
                 public void onNothingSelected(AdapterView<?> parent) {
@@ -284,47 +272,24 @@ public class MainMenu extends AppCompatActivity {
 
 
         public static void configGridView() {
-            System.out.print("ConfigGridView: ");
-            //config gridview
-
-            if(gridView == null) {
-                gridView = (GridView) rootView.findViewById(R.id.gridView);
-            }
-
-            System.out.println(gridView);
-
             ArrayAdapter<String> adapterGrid = new ArrayAdapter<String>(rootView.getContext(),
                     android.R.layout.simple_list_item_1, scores);
-
-
 
             gridView.setAdapter(adapterGrid);
         }
 
         public static void changerDispo() {
-            Log.d("test","changeDispo");
-
             if(imageDispo != null) {
-                System.out.println("isDispo:" + isDispo);
+                Log.d("isDispo:",String.valueOf(isDispo));
                 if(isDispo) {
-                    Log.d("test","dispo");
+                    Log.d("changerDispo","dispo");
                     imageDispo.setImageResource(R.drawable.disponible);
                 } else {
-                    Log.d("test","occupe");
+                    Log.d("changerDispo","occupe");
                    imageDispo.setImageResource(R.drawable.occupe);
                 }
             }
         }
-
-
-
-
-        /*private View.OnClickListener touchListener = new View.OnClickListener() {
-            public void onClick(View v) {
-                Log.d("touch", "touch");
-                changerDispo();
-            }
-        };*/
     }
 
     /**
@@ -339,6 +304,7 @@ public class MainMenu extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
+            Log.d("position",String.valueOf(position));
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
             return PlaceholderFragment.newInstance(position + 1);

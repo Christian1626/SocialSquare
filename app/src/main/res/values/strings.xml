@@ -34,4 +34,6 @@
         <item name="android:shadowDy">1</item>
         <item name="android:shadowRadius">1</item>
     </style>
+
+    <string name="title_activity_test">TestActivity</string>
 </resources>

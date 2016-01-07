@@ -100,32 +100,6 @@ public class WebService {
         return null;
     }
 
-    public void getTremblement() {
-        String tremblementWS = "http://earthquake-report.com/feeds/recent-eq?json";
-
-
-        try {
-            // Envoi de la requête
-            InputStream inputStream = sendRequest(new URL(tremblementWS));
-
-            // Vérification de l'inputStream
-            if(inputStream != null) {
-                // Lecture de l'inputStream dans un reader
-                InputStreamReader reader = new InputStreamReader(inputStream);
-
-                // Retourne la liste désérialisée par le moteur GSON
-                List<Tremblement> list =  gson.fromJson(reader, new TypeToken<List<Tremblement>>() {
-                }.getType());
-                Log.d("Webservice: list", Integer.toString(list.size()));
-                Log.d("Webservice: exemple 1:",list.get(1).toString());
-            }
-
-        } catch (Exception e) {
-            Log.e("WebService", "Impossible de rapatrier les données 3:");
-            e.printStackTrace();
-        }
-    }
-
     public boolean isUsed() {
         boolean estDispo = true;
 

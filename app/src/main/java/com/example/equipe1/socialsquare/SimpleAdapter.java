@@ -22,30 +22,25 @@ public class SimpleAdapter extends BaseAdapter {
     SimpleAdapter(Context context, List<Joueur> rowItem) {
         this.context = context;
         this.rowItem = rowItem;
-
     }
 
     @Override
     public int getCount() {
-
         return rowItem.size();
     }
 
     @Override
     public Object getItem(int position) {
-
         return rowItem.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-
         return rowItem.indexOf(getItem(position));
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
         if (convertView == null) {
             LayoutInflater mInflater = (LayoutInflater) context
                     .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
@@ -60,7 +55,6 @@ public class SimpleAdapter extends BaseAdapter {
             }
         });
         TextView txtTitle = (TextView) convertView.findViewById(R.id.title);
-
         Joueur row_pos = rowItem.get(position);
         txtTitle.setText(row_pos.getName());
 

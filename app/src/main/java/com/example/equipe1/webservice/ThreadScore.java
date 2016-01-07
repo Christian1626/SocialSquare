@@ -18,7 +18,6 @@ public class ThreadScore extends AsyncTask<Void, Integer, Void>
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-
     }
 
     @Override
@@ -29,22 +28,19 @@ public class ThreadScore extends AsyncTask<Void, Integer, Void>
 
     @Override
     protected Void doInBackground(Void... arg0) {
-        System.out.println("4");
         Log.d("doInBackGround", "debut");
         WebService ws = new WebService();
         scores = ws.getScores(jeu);
+        for(int i=0;i<scores.length;i++) {
+            Log.d(String.valueOf(i),scores[i]);
+        }
+
         return null;
     }
 
     @Override
     protected void onPostExecute(Void result) {
-        System.out.println("OnPreEx");
-        String[] array = {"test","test","test"};
-        //System.out.println("scores:"+scores[1]);
-
         MainMenu.PlaceholderFragment.scores = scores ;
         MainMenu.PlaceholderFragment.configGridView();
-        System.out.println("OnPreEx2");
-
     }
 }

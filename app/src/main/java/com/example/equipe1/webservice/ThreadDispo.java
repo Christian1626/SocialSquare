@@ -18,25 +18,20 @@ public class ThreadDispo extends AsyncTask<Void, Integer, Void>
     @Override
     protected void onProgressUpdate(Integer... values){
         super.onProgressUpdate(values);
-
     }
 
     @Override
     protected Void doInBackground(Void... arg0) {
-        System.out.println("4");
         Log.d("doInBackGround", "debut");
         WebService ws = new WebService();
         isDispo = !ws.isUsed();
+        Log.d("Thread isDispo",String.valueOf(isDispo));
         return null;
     }
 
     @Override
     protected void onPostExecute(Void result) {
-        System.out.println("OnPreEx");
         MainMenu.PlaceholderFragment.isDispo = isDispo ;
         MainMenu.PlaceholderFragment.changerDispo();
-        System.out.println("valeur dispo:"+isDispo);
-        System.out.println("OnPreEx2");
-
     }
 }
