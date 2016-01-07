@@ -4,16 +4,13 @@ package com.example.equipe1.webservice;
  * Created by Cricri on 06/01/2016.
  */
 public class Disponibilite {
-    boolean isDispo;
+    boolean used;
 
-    public boolean isDispo() {
-        return isDispo;
+    public boolean isUsed() {
+        return used;
     }
 
-    public void setIsDispo(boolean isDispo) {
-        this.isDispo = isDispo;
+    public void setUsed(boolean used) {
+        this.used = used;
     }
-
-
-
 }

@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -18,6 +19,9 @@ import java.util.List;
 public class WebService {
 
     Gson gson;
+    private int port = 8000;
+    private String ip = "192.168.43.203";
+
 
     public WebService() {
         gson = new Gson();
@@ -42,8 +46,9 @@ public class WebService {
         return null;
     }
 
-   public List<Score> getScores(String jeu) {
-       String scoreWS = "http://192.168.12.204:8000/get_score?game="+jeu;
+   public String[] getScores(String jeu) {
+       String scoreWS = "http://"+ip+":"+port+"/get_score?game="+jeu;
+       Log.d("Webservice","getScores");
 
         try {
             // Envoi de la requête
@@ -55,22 +60,28 @@ public class WebService {
                 InputStreamReader reader = new InputStreamReader(inputStream);
 
                 // Retourne la liste désérialisée par le moteur GSON
-                return gson.fromJson(reader, new TypeToken<List<Score>>() {
+                List<Score> list =  gson.fromJson(reader, new TypeToken<List<Score>>() {
                 }.getType());
+
+                String[] array = listToArrayScore(list);
+
+                return array;
+
             }
 
         } catch (Exception e) {
-            Log.e("WebService", "Impossible de rapatrier les données :(");
+            Log.e("WebService", "Impossible de rapatrier les données 1: score");
+            e.printStackTrace();
         }
        return null;
     }
 
     public List<Jeu> getJeu() {
-        String scoreWS = "http://earthquake-report.com/feeds/recent-eq?json";
+        String jeuWS = "http://"+ip+":"+port+"/get_game";
 
         try {
             // Envoi de la requête
-            InputStream inputStream = sendRequest(new URL(scoreWS));
+            InputStream inputStream = sendRequest(new URL(jeuWS));
 
             // Vérification de l'inputStream
             if(inputStream != null) {
@@ -83,7 +94,8 @@ public class WebService {
             }
 
         } catch (Exception e) {
-            Log.e("WebService", "Impossible de rapatrier les données :(");
+            Log.e("WebService", "Impossible de rapatrier les données 2: jeu(");
+            e.printStackTrace();
         }
         return null;
     }
@@ -109,15 +121,15 @@ public class WebService {
             }
 
         } catch (Exception e) {
-            Log.e("WebService", "Impossible de rapatrier les données :");
+            Log.e("WebService", "Impossible de rapatrier les données 3:");
             e.printStackTrace();
         }
     }
 
-    public boolean isDispo() {
+    public boolean isUsed() {
         boolean estDispo = true;
 
-        String dispoWS = "http://earthquake-report.com/feeds/recent-eq?json";
+        String dispoWS = "http://"+ip+":"+port+"/get_terminal?id=1";
         try {
             // Envoi de la requête
             InputStream inputStream = sendRequest(new URL(dispoWS));
@@ -129,12 +141,30 @@ public class WebService {
 
                 // Retourne la liste désérialisée par le moteur GSON
                 Disponibilite dispo =  gson.fromJson(reader, new TypeToken<Disponibilite>(){}.getType());
-                return dispo.isDispo();
+                System.out.println("Webservice dispo:"+dispo);
+                return dispo.isUsed();
             }
 
         } catch (Exception e) {
-            Log.e("WebService", "Impossible de rapatrier les données :(");
+            Log.e("WebService", "Impossible de rapatrier les données 4: dispo(");
+            e.printStackTrace();
         }
         return estDispo;
+    }
+
+    public String[] listToArrayScore(List<Score> list) {
+        int n = Math.min(list.size(), 7);
+        String[] array = new String[n*3+3];
+        array[0] = "Place";
+        array[1] = "Nom";
+        array[2] = "Score";
+
+        for(int i=0;i<n;i++){
+            array[3+i*3] = String.valueOf(i+1);
+            array[3+i*3+1] = list.get(i).getUsername();
+            array[3+i*3+2] = Integer.toString(list.get(i).getScore());
+        }
+
+        return array;
     }
 }

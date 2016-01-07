@@ -1,5 +1,6 @@
 package com.example.equipe1.socialsquare;
 
+import android.os.AsyncTask;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -28,13 +29,16 @@ import android.widget.Spinner;
 
 
 import com.example.equipe1.webservice.Joueur;
+import com.example.equipe1.webservice.Score;
+import com.example.equipe1.webservice.ThreadDispo;
+import com.example.equipe1.webservice.ThreadScore;
 import com.example.equipe1.webservice.ThreadWS;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
+import java.util.concurrent.ExecutionException;
 
 
 public class MainMenu extends AppCompatActivity {
@@ -77,9 +81,9 @@ public class MainMenu extends AppCompatActivity {
         //TODO: modifier avec les bon webservices
         callAsynchronousTask();
 
-
         getSupportActionBar().hide();
     }
+
 
     public void callAsynchronousTask() {
         final Handler handler = new Handler();
@@ -90,7 +94,7 @@ public class MainMenu extends AppCompatActivity {
                 handler.post(new Runnable() {
                     public void run() {
                         try {
-                            ThreadWS performBackgroundTask = new ThreadWS();
+                            ThreadDispo performBackgroundTask = new ThreadDispo();
                             // PerformBackgroundTask this class is the class that extends AsynchTask
                             performBackgroundTask.execute();
                         } catch (Exception e) {
@@ -102,6 +106,8 @@ public class MainMenu extends AppCompatActivity {
         };
         timer.schedule(doAsynchronousTask, 0, 1000*10); //execute in every 50000 ms
     }
+
+
 
 
 
@@ -136,23 +142,29 @@ public class MainMenu extends AppCompatActivity {
          * fragment.
          */
 
-
+        public static boolean isDispo = true;
+        public static ImageView imageDispo;
         private static final String ARG_SECTION_NUMBER = "section_number";
-        private boolean isDispo = true;
-        private View rootView;
-        private String[] scores1 = new String[] {
+        public static View rootView;
+        public static GridView gridView;
+        public static String[] scores1 = new String[] {
                 "Place","Nom","Score",
                 "1","Toto", "100","2", "Titi", "95","3", "Tata",
                 "80", "4","Tutu", "76","5", "Toto", "60","6",
-                "Coco", "50", "7","TheNoob", "0"};
+                "Coco", "50", "7","TheNoob"};
 
-        private String[] scores2 = new String[] {
+        public static String[] scores2 = new String[] {
                 "Place","Nom","Score",
                 "1","Paul", "88","2", "Thomas", "85","3", "Jack",
                 "78", "4","Tom", "67","5", "Jim", "55","6",
                 "George", "60", "7","Jerry", "55"};
 
-        private String[] scores = scores1;
+        public void setScores(String[] scores) {
+            this.scores = scores;
+        }
+
+        public static String[] scores = scores1;
+        //private List<Score> scores;
 
         public PlaceholderFragment() {
         }
@@ -179,19 +191,23 @@ public class MainMenu extends AppCompatActivity {
             //=================
             if(getArguments().getInt(ARG_SECTION_NUMBER) == 1) {
                 rootView = inflater.inflate(R.layout.fragment_main_menu,container,false);
-                rootView.setOnClickListener(touchListener);
-                changerDispo();
-
-
+                //
+                // rootView.setOnClickListener(touchListener);
+                imageDispo = (ImageView) rootView.findViewById(R.id.img_dispo);
+                System.out.println("imagedispo:"+imageDispo);
+                //changerDispo();
             }
             //=================
             //   TOP SCORES
             //=================
             else if(getArguments().getInt(ARG_SECTION_NUMBER) == 2) {
                 rootView = inflater.inflate(R.layout.fragment_topscores,container,false);
-
+                System.out.println("1");
+                configScore("TicTacToe");
+                System.out.println("2");
                 configSpinner();
                 configGridView();
+                System.out.println("3");
 
 
             }
@@ -223,6 +239,11 @@ public class MainMenu extends AppCompatActivity {
             return rootView;
         }
 
+        public void configScore(String jeu) {
+            ThreadScore ws = new ThreadScore(jeu);
+            ws.execute();
+        }
+
 
         void configSpinner() {
             //config spinner
@@ -230,9 +251,12 @@ public class MainMenu extends AppCompatActivity {
             Spinner spinner = (Spinner) rootView.findViewById(R.id.spinner);
             //Création d'une liste d'élément à mettre dans le Spinner(pour l'exemple)
             List listJeux = new ArrayList();
-            listJeux.add("Jeux 1");
-            listJeux.add("Jeux 2");
-            listJeux.add("Jeux 3");
+            listJeux.add("TicTacToe");
+            listJeux.add("Memory");
+            listJeux.add("ConnectFour");
+            listJeux.add("Dance");
+            listJeux.add("HopScotch");
+            listJeux.add("RunAfterTheLight");
 
             ArrayAdapter adapterSpinner = new ArrayAdapter(
                     rootView.getContext(),
@@ -243,18 +267,13 @@ public class MainMenu extends AppCompatActivity {
             adapterSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinner.setAdapter(adapterSpinner);
 
-            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-            {
+            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    String selectedItem = parent.getItemAtPosition(position).toString();
+                    String jeu = parent.getItemAtPosition(position).toString();
+                    System.out.println("nom: " + jeu);
+                    configScore(jeu);
 
-                    if (selectedItem.equals("Jeux 1")) {
-                        scores = scores1;
-                    } else {
-                        scores = scores2;
-                    }
-
-                    configGridView();
+                    //configGridView();
                 }
 
                 public void onNothingSelected(AdapterView<?> parent) {
@@ -263,32 +282,30 @@ public class MainMenu extends AppCompatActivity {
             });
         }
 
-        void configGridView() {
-            //config gridview
-            GridView gridView;
 
-            gridView = (GridView) rootView.findViewById(R.id.gridView);
+        public static void configGridView() {
+            System.out.print("ConfigGridView: ");
+            //config gridview
+
+            if(gridView == null) {
+                gridView = (GridView) rootView.findViewById(R.id.gridView);
+            }
+
+            System.out.println(gridView);
 
             ArrayAdapter<String> adapterGrid = new ArrayAdapter<String>(rootView.getContext(),
                     android.R.layout.simple_list_item_1, scores);
 
+
+
             gridView.setAdapter(adapterGrid);
         }
 
-        void changerDispo() {
-
-            ImageView imageDispo = null;
-            imageDispo = (ImageView) rootView.findViewById(R.id.img_dispo);
+        public static void changerDispo() {
             Log.d("test","changeDispo");
 
-            if(isDispo) {
-                isDispo = false;
-            } else {
-                isDispo = true;
-            }
-
             if(imageDispo != null) {
-                System.out.println("isDispo:"+isDispo);
+                System.out.println("isDispo:" + isDispo);
                 if(isDispo) {
                     Log.d("test","dispo");
                     imageDispo.setImageResource(R.drawable.disponible);
@@ -302,12 +319,12 @@ public class MainMenu extends AppCompatActivity {
 
 
 
-        private View.OnClickListener touchListener = new View.OnClickListener() {
+        /*private View.OnClickListener touchListener = new View.OnClickListener() {
             public void onClick(View v) {
                 Log.d("touch", "touch");
                 changerDispo();
             }
-        };
+        };*/
     }
 
     /**

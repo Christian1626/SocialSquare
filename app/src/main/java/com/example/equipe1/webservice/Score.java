@@ -4,16 +4,12 @@ package com.example.equipe1.webservice;
  * Created by Cricri on 06/01/2016.
  */
 public class Score {
-    private String name;
+    private String username;
     private int score;
-    private String game;
 
-    public String getGame() {
-        return game;
-    }
-
-    public void setGame(String game) {
-        this.game = game;
+    public Score(String username, int score) {
+        this.username = username;
+        this.score = score;
     }
 
     public int getScore() {
@@ -24,15 +20,12 @@ public class Score {
         this.score = score;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public String getUsername() {
+        return username;
     }
 
 
-
-
+    public void setUsername(String username) {
+        this.username = username;
+    }
 }
