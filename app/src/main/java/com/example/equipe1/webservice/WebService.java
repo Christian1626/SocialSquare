@@ -42,8 +42,8 @@ public class WebService {
         return null;
     }
 
-   public List<Score> getScores() {
-       String scoreWS = "http://earthquake-report.com/feeds/recent-eq?json";
+   public List<Score> getScores(String jeu) {
+       String scoreWS = "http://192.168.12.204:8000/get_score?game="+jeu;
 
         try {
             // Envoi de la requête
@@ -56,6 +56,29 @@ public class WebService {
 
                 // Retourne la liste désérialisée par le moteur GSON
                 return gson.fromJson(reader, new TypeToken<List<Score>>() {
+                }.getType());
+            }
+
+        } catch (Exception e) {
+            Log.e("WebService", "Impossible de rapatrier les données :(");
+        }
+       return null;
+    }
+
+    public List<Jeu> getJeu() {
+        String scoreWS = "http://earthquake-report.com/feeds/recent-eq?json";
+
+        try {
+            // Envoi de la requête
+            InputStream inputStream = sendRequest(new URL(scoreWS));
+
+            // Vérification de l'inputStream
+            if(inputStream != null) {
+                // Lecture de l'inputStream dans un reader
+                InputStreamReader reader = new InputStreamReader(inputStream);
+
+                // Retourne la liste désérialisée par le moteur GSON
+                return gson.fromJson(reader, new TypeToken<List<Jeu>>() {
                 }.getType());
             }
 

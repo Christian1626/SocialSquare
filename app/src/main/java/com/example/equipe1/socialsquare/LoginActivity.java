@@ -58,23 +58,23 @@ public class LoginActivity extends AppCompatActivity  {
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private UserLoginTask mAuthTask = null;
+    //private UserLoginTask mAuthTask = null;
 
     // UI references.
-    private AutoCompleteTextView login;
-    private EditText password;
+    private EditText login;
+    //private EditText password;
     private View mProgressView;
     private View mLoginFormView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_login2);
         // Set up the login form.
-        login = (AutoCompleteTextView) findViewById(R.id.login);
+        login = (EditText) findViewById(R.id.login);
        // populateAutoComplete();
 
-        password = (EditText) findViewById(R.id.password);
+        //password = (EditText) findViewById(R.id.password);
 
         Button connexion = (Button) findViewById(R.id.connexion_button);
         connexion.setOnClickListener(new OnClickListener() {
@@ -87,31 +87,11 @@ public class LoginActivity extends AppCompatActivity  {
             }
         });
 
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
+       // mLoginFormView = findViewById(R.id.login_form);
+       // mProgressView = findViewById(R.id.login_progress);
     }
 
 
-
-    /**
-     * Callback received when a permissions request has been completed.
-     */
-    /*@Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_READ_CONTACTS) {
-            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                populateAutoComplete();
-            }
-        }
-    }*/
-
-
-    /**
-     * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
-     */
 
 
     private boolean isEmailValid(String email) {
@@ -127,7 +107,7 @@ public class LoginActivity extends AppCompatActivity  {
     /**
      * Shows the progress UI and hides the login form.
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+  /*  @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
         // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
         // for very easy animations. If available, use these APIs to fade-in
@@ -158,7 +138,7 @@ public class LoginActivity extends AppCompatActivity  {
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
-    }
+    }*/
 
     /*@Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
@@ -204,7 +184,7 @@ public class LoginActivity extends AppCompatActivity  {
     }*/
 
 
-    private interface ProfileQuery {
+   /* private interface ProfileQuery {
         String[] PROJECTION = {
                 ContactsContract.CommonDataKinds.Email.ADDRESS,
                 ContactsContract.CommonDataKinds.Email.IS_PRIMARY,
@@ -213,12 +193,12 @@ public class LoginActivity extends AppCompatActivity  {
         int ADDRESS = 0;
         int IS_PRIMARY = 1;
     }
-
+*/
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+   /* public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
         private final String mEmail;
         private final String mPassword;
@@ -268,7 +248,7 @@ public class LoginActivity extends AppCompatActivity  {
         protected void onCancelled() {
             mAuthTask = null;
             showProgress(false);
-        }*/
-    }
+        }
+    }*/
 }
 
